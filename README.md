@@ -1,0 +1,1 @@
+Use newest version of chrome to view because `-webkit-clip-path` is used.
