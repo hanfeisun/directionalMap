@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="./mapbox.css">
+    <script src="lodash.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js'></script>
+    <script src="directionalMap.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            -webkit-clip-path: circle(500px at center);
+
+
+        }
+    </style>
+</head>
+<body>
+<div id="map">
+
+</div>
+</body>
+<script>
+
+
+    function makeCircle (center, radius) {
+        var ret = [];
+        for (var ang = 0; ang < Math.PI; ang += 0.02) {
+            ret.push([center[0] + Math.sin(ang)*radius, center[1] + Math.cos(ang)*radius])
+        }
+        return ret
+    }
+
+    function tick () {
+
+    }
+
+    var mapElem = document.getElementById("map"),
+            mapModel = new DM_Model(makeCircle([-71.0587, 42.3610], 0.02)),
+            mapView = new DM_View(mapModel, mapElem);
+
+
+    mapView.init();
+    mapView.tickInit();
+
+
+</script>
+
+
+</html>
