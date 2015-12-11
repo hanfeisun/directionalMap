@@ -48,7 +48,7 @@ var DM_View = function (model, element) {
         current: 0
     };
 
-    this._zoomLevel = 15;
+    this._zoomLevel = 16;
 
     this._cache = {}
 };
@@ -64,12 +64,9 @@ DM_View.prototype.getPolyline = function (options) {
 DM_View.prototype.init = function (options) {
     L.mapbox.accessToken = 'pk.eyJ1IjoiaGFuZmVpc3VuIiwiYSI6IngxeTR3aDAifQ.JVqDW0a7P5fgFHknSX3nOg';
 
-    // Replace 'mapbox.streets' with your map id.
-    var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-    });
 
-    this._map = L.map(this._elem, options).addLayer(mapboxTiles).setView(this._model.getLngLatAt(0), this._zoomLevel);
+
+    this._map = L.mapbox.map(this._elem, 'mapbox.high-contrast').setView(this._model.getLngLatAt(0), this._zoomLevel);
     this.getPolyline().addTo(this._map);
 
 };
@@ -92,13 +89,12 @@ DM_View.prototype.update = function () {
 
 
     if (!this._cache.marker) {
-        this._cache.marker = L.circle(latlng, 30).addTo(this._map)
+        this._cache.marker = L.circle(latlng, 20).addTo(this._map)
     } else {
         this._cache.marker.setLatLng(latlng)
     }
 
     this._map.setView(latlng, this._zoomLevel);
-    console.log(direction);
     this._elem.style.transform = "rotate(-" + direction + "deg)";
 
 };
@@ -111,7 +107,7 @@ DM_View.prototype.tickInit = function () {
         if (self.state.current < self._model.getLength()) {
             self.setState({current: self.state.current + 1})
         }
-    }, 500)
+    }, 33)
 };
 
 
@@ -119,3 +115,6 @@ DM_View.prototype.setState = function (state) {
     this.state = state;
     this.update();
 };
+
+
+

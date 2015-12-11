@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Marker movement</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+<div id='map'></div>
+
+<script>
+	L.mapbox.accessToken = 'pk.eyJ1IjoiaGFuZmVpc3VuIiwiYSI6IngxeTR3aDAifQ.JVqDW0a7P5fgFHknSX3nOg';
+    L.RotatedMarker = L.Marker.extend({
+        options: {angle: 0},
+        _setPos: function (pos) {
+            L.Marker.prototype._setPos.call(this, pos);
+            if (L.DomUtil.TRANSFORM) {
+                // use the CSS transform rule if available
+                this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
+            } else if (L.Browser.ie) {
+                // fallback for IE6, IE7, IE8
+                // Just ignore it!
+            }
+        }
+    });
+    L.rotatedMarker = function (pos, options) {
+        return new L.RotatedMarker(pos, options);
+    };
+	
+	var seq = parseInt(getQueryString("seq"));
+	var pathName = getQueryString("path");
+
+	var pathWrapper = getPath(pathName);
+	var pathList = pathWrapper["path"];
+
+	var lati = pathList[seq][0];
+	var longi = pathList[seq][1];
+
+
+	var map = L.mapbox.map('map', 'hanfeisun.6460d4fb')
+	  .setView([lati, longi], 16);
+	  
+	var marker1 = L.marker([lati, longi], {
+		icon: L.mapbox.marker.icon({
+		  'marker-color': '#f86767'
+		})
+	});	
+	marker1.addTo(map);
+
+	
+	var polyline_options = {
+		color: '#adff2f',
+		weight: 7
+	}
+
+
+	var polyline = L.polyline(pathList, polyline_options ).addTo(map);
+
+	
+	function getQueryString(name) {
+	   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+	   var r = window.location.search.substr(1).match(reg);
+	   if (r!=null) return decodeURIComponent(r[2]); return null;
+	}
+
+	function getPath(pathName) {
+		if (!pathName) {
+			throw "Need a `path` parameter"
+		}
+		var URL = pathName + ".json";
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open("GET", URL, false); // false for synchronous request
+		xmlHttp.send(null);
+
+		return JSON.parse(xmlHttp.responseText)
+	}
+
+
+	function ConvertPositionAngel(soucePoint, targetPoint) {
+        var res = (Math.atan2(targetPoint.y - soucePoint.y, targetPoint.x - soucePoint.x)) / Math.PI * 180.0;
+        return (res >= 0 && res <= 180) ? res += 90 : ((res < 0 && res >= -90) ? res += 90 : res += 450);
+    }
+	function resetLngLat() {
+		longi = 0;
+		lati = 0;
+	}
+	function setLngLat(new_longi, new_lati) {	
+		//marker2.setLatLng(L.latLng(new_lati, new_longi));		
+		map.panTo([new_lati, new_longi]);
+		if (longi != 0 && lati != 0) {
+			polyline.addLatLng(L.latLng(lati, longi));
+			var angleDeg = ConvertPositionAngel(
+				{x: lati, y: longi},
+				{x: new_lati, y: new_longi});
+			marker2.options.angle = (angleDeg - 90) % 360;
+			marker2.setLatLng(L.latLng(new_lati, new_longi));	
+		} else {
+			marker1.setLatLng(L.latLng(new_lati, new_longi));
+			marker1.update();
+		}
+		longi = new_longi;
+		lati = new_lati;		
+		//map.clearOverlays(marker2);
+	}
+</script>
+</body>
+</html>

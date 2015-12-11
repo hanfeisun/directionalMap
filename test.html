@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./mapbox.css">
     <script src="lodash.js"></script>
     <script src='https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js'></script>
+    <script src="movingMarker.js"></script>
     <script src="directionalMap.js"></script>
     <style>
         body {
@@ -34,7 +35,7 @@
 
     function makeCircle (center, radius) {
         var ret = [];
-        for (var ang = 0; ang < Math.PI; ang += 0.02) {
+        for (var ang = 0; ang < Math.PI; ang += 0.001) {
             ret.push([center[0] + Math.sin(ang)*radius, center[1] + Math.cos(ang)*radius])
         }
         return ret
